@@ -391,7 +391,7 @@
 		for (let i = 0; i < events.length; i++) {
 			// Pour chaque événement, charger une flèche avec la bonne orientation
 			d3.xml(`./img/arrow${events[i].orientation}.svg`)
-				mimeType('image/svg+xml')
+				.mimeType('image/svg+xml')
 				.get(function(error, xml) {
 					let importedNode = document.importNode(xml.documentElement, true);
 					let path = d3.select(importedNode).select('path').node();
