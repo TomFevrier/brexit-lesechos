@@ -1,0 +1,696 @@
+/*IMPORT DES TYPOS*/
+
+@import url('https://fonts.googleapis.com/css?family=Merriweather|Source+Sans+Pro:200|Source+Sans+Pro:400|Source+Sans+Pro:600');
+
+@font-face {
+    font-family: 'aveny_tbold';
+    src: url('../font/avenyt-bold-webfont.woff2') format('woff2'),
+         url('../font/avenyt-bold-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+@font-face {
+    font-family: 'aveny_tmedium';
+    src: url('../font/avenyt-medium-webfont.woff2') format('woff2'),
+         url('../font/venyt-medium-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'lacrima_serifregular';
+    src: url('../font/lacrimaserif-webfont.woff2') format('woff2'),
+         url('../font/lacrimaserif-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+body{
+	margin: 0;
+	padding: 0;
+	background: snow;
+	font-smoothing: antialiased;
+	-moz-font-smoothing: antialiased;
+	-webkit-font-smoothing: antialiased;
+	/*background: url(images/concrete.jpg) no-repeat center center fixed;*/
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+}
+
+.conteneur{
+	margin: 0;
+	padding: 0;
+	position: relative;
+}
+
+@media screen and (max-width: 2600px) {
+    .conteneur{
+		margin-left: 35%;
+		margin-right: 35%;
+	}
+}
+
+@media screen and (max-width: 1200px) {
+    .conteneur{
+		margin-left: 30%;
+		margin-right: 30%;
+	}
+}
+
+@media screen and (max-width: 800px) {
+    .conteneur{
+		margin-left: 22%;
+		margin-right: 22%;
+	}
+}
+
+@media screen and (max-width: 800px) {
+    .conteneur{
+		margin-left: 12%;
+		margin-right: 12%;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+/*LE CACHE DE CHARGEMENT*/
+
+.cache{
+    background: rgba(10,10,10,1);
+    position: absolute;
+    top: 0
+    left: 0;
+    z-index: 99;
+    width: 100%;
+    height: 100vh;
+}
+
+#wrapper_cache{
+    padding-top: 38vh;
+}
+
+#phrase_preload{
+    font-family: lacrima_serifregular;
+    color: snow;
+    font-size: 2em;
+    text-align: center;
+    opacity: 0.9;
+}
+
+.logo_preload{
+    opacity: 0.7;
+    width: 180px;
+    display: block;
+    margin: auto;
+}
+
+.logo_intro{
+    opacity: 0.7;
+    width: 180px;
+    display: block;
+    margin: auto;
+    margin-top: 25px;
+}
+
+.loader {
+    border: 10px solid #f3f3f3; /* Light grey */
+    border-top: 10px solid grey; /* Blue */
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: auto;
+    margin-top: 2%;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+
+/*INTRODUCTION*/
+
+
+#intro{
+    width: 100%;
+    height: 100vh;
+}
+
+#titraille{
+    width: 100%;
+    height: 100vh;
+    /*position: absolute;
+    top: 0;
+    left: 0;*/
+    /*background: rgba(205,23,23,0.85);*/
+    background: rgba(255,255,255,0.7);
+    z-index: 999;
+    display:table;
+    background: url(../img/brexit-intro.jpg) no-repeat center center fixed;
+    background-size: cover;
+}
+
+#wrapper_titraille{
+    display:table-cell;
+    vertical-align:middle;
+}
+
+#bloc_titre{
+    background: rgba(255,255,255,0.9);
+    display: block;
+    width: 50%;
+    max-width: 600px;
+    margin: auto;
+    border: 4px solid black;
+    padding: 25px;
+}
+
+#wrapper_titraille img{
+    display: block;
+    margin: auto;
+    max-width: 160px;
+    margin-top: 25px;
+}
+
+.conteneur img {
+    display: block;
+    width: 100%;
+    margin: 1.5em 0;
+}
+
+h1{
+    font-family: aveny_tmedium;
+    font-size: 4em;
+    line-height: 0.95em;
+    margin: auto;
+    margin-bottom: 10px;
+    text-align: center;
+    color: black;
+}
+
+#chapeau{
+    font-family: lacrima_serifregular;
+    color: black;
+    text-align: center;
+    font-size: 1.2em;
+    margin: 0;
+    padding: 0;
+    margin-top: 25px;
+}
+
+
+#noms_intro{
+    font-family: Source Sans Pro;
+    color: black;
+    font-size: 1.1em;
+    max-width: 800px;
+    text-align: center;
+    margin: auto;
+    margin-top: 15px;
+    max-width: 50%
+}
+
+
+
+
+
+
+#bandeau_echos{
+    background: rgba(255,255,255,0.85);
+    width: 100%;
+    height: 30px;
+    position: fixed;
+    top: 0;
+    z-index: 999;
+    display: none;
+}
+
+#timer{
+    background: #D61D17;
+    position: fixed;
+    top: 30px;
+    left: 0;
+    height: 2px;
+    width: 0%;
+    z-index: 999999;
+    transtion: all 0.3s;
+}
+
+#logobandeau{
+    max-height: 20px;
+    position: absolute;
+    left: 10px;
+    top: 5px;
+}
+
+.logo_social{
+    max-height: 18px;
+    display: inline-block;
+    float: right;
+    margin-top: 6px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+
+
+/*LIENS*/
+.paragraphe a, .step a {
+    text-decoration: none;
+    color: #D61D17;
+    font-weight: bold;
+    transition: all 0.2s;
+    padding-left: 3px;
+    padding-right: 3px;
+    background-size: 100% 200%;
+    background-image: linear-gradient(to bottom,
+                          transparent,
+                          transparent 50%,
+                          #D61D17 50%,
+                          #D61D17);
+    transition: background-position 0.2s;
+}
+
+.paragraphe a:hover{
+    color: white;
+    background-position: 0% 100%;
+    cursor: pointer;
+}
+
+
+
+
+.annotation {
+    font: bold 18px Source Sans Pro;
+}
+
+
+
+
+
+/*SCROLLAMA*/
+#scrolly {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    background: snow;
+}
+
+#scrolly > * {
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+}
+
+
+article {
+    position: relative;
+    padding: 0 1rem;
+    max-width: 30%;
+}
+
+figure {
+    position: -webkit-sticky;
+    position: sticky;
+    width: 70%;
+    margin: 0;
+    -webkit-transform: translate3d(0, 0, 0);
+    -moz-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+}
+
+
+.step {
+    margin: 0 auto 2rem auto;
+    background-color: white;
+    border: 2px solid black;
+    color: black;
+    font-family: Source Sans Pro;
+    margin-bottom: 60vh;
+    max-width: 70%;
+}
+
+.step:first-child {
+    margin-top: 100vh;
+}
+
+.step:last-child {
+    margin-bottom: 100vh;
+}
+
+.step h3 {
+    text-align: center;
+    font-family: aveny_tbold;
+    display: block;
+    /*background: #D61D17;*/
+    background: rgba(213,67,47,1);
+    color: white;
+    padding: 0.5em;
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+
+
+.step p{
+    margin: 0;
+    font-size: 1.2rem;
+    padding: 1em;
+}
+
+.step img {
+    display: block;
+    width: 90%;
+    margin: 0 auto;
+}
+
+.step .caption {
+    color: grey;
+    font-size: 1rem;
+    padding: 1em;
+    padding-top: 0.5em;
+}
+
+.step .link {
+    margin: 0;
+    padding: 0.5em 1em 1em;
+}
+
+.step .link a {
+    color: rgba(213,67,47,1);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+@media screen and (max-width: 1250px) {
+    .step{max-width: 85%}
+}
+
+@media screen and (max-width: 1050px) {
+    figure{max-width: 60%;}
+    article{max-width: 40%;}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*ELEMENTS DE CARTE*/
+.carte{
+	z-index: 2;
+	position: relative;
+	width: 100%;
+	height: 100vh;
+    /*max-width: 1100px;*/
+    margin: auto;
+	/*width: 960px;
+	height: 800px;*/
+}
+
+
+svg circle:hover{
+	cursor: pointer;
+	stroke: #cd1719;
+}
+
+.xAxis, .yAxis {
+    font: 14px Source Sans Pro;
+}
+
+.xAxis path, .yAxis path, .xAxis line, .yAxis line {
+    stroke: grey;
+}
+
+.xAxis text, .yAxis text {
+    fill: grey;
+}
+
+.yAxis path {
+    opacity: 0;
+}
+
+
+.flourish-embed{
+    margin-top: 40px;
+}
+
+#titre_carte{
+    text-align: center;
+    position: fixed;
+    top: 55px;
+    right: 35px;
+    z-index: 999;
+    font-family: Source Sans Pro;
+    display: none;
+    /*background: #D61D17;*/
+    background: rgba(213,67,47,1);
+    color: white;
+    padding: 0.5em;
+    font-weight: 600;
+    font-size: 1rem;
+    max-width: 300px;
+}
+
+
+
+/*TEXTES*/
+
+p.paragraphe{
+	text-align: left;
+	font-family: Source Sans Pro;
+	font-size: 1.2em;
+	margin: 0;
+	padding: 0;
+	margin-top: 25px;
+}
+
+p.premier_paragraphe{
+    margin-top: 100px
+}
+
+p.dernier_paragraphe{
+	margin-bottom: 100px
+}
+
+
+
+
+
+
+
+
+
+
+/*PREVIOUSLY ON LOST*/
+
+#previously{
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: 30px;
+    height: auto;
+    background: rgba(0,0,0,0.85);
+    padding-top: 20px;
+    padding-bottom: 40px;
+}
+
+#wrapper_previously{
+    width: 94%;
+    margin: auto;
+    position: relative;
+    height: auto;
+    /*background: snow;*/
+}
+
+.previously_item{
+    width: 30%;
+    position: relative;
+    margin-right: 5%;
+    background: rgba(0,0,0,0.9);
+    display: inline-block;
+    cursor: pointer;
+    transition: all 0.25s;
+}
+
+.previously_item:hover{
+    opacity: 0.8;
+}
+
+.previously_item:nth-child(4){margin-right: 0!important;}
+
+.texte_previously_item{
+    font-family: lacrima_serifregular;
+    color: rgba(255,255,255,0.75);
+    text-align: center;
+    margin-left: 2%;
+    margin-right: 2%;
+}
+
+.titre_previously_item{
+    font-family: aveny_tmedium;
+    color: rgba(255,255,255,0.9);
+    font-weight: 1.2em;
+    line-height: 1em;
+    font-size: 2em;
+    margin: 0;
+    margin-top: 12px;
+    font-weight: 400!important;
+    text-align: center;
+}
+
+#previously_retrouvez{
+    margin-top: 15px!important;
+    margin-bottom: 30px;
+    font-family: lacrima_serifregular;
+    color: rgba(255,255,255,0.5);
+    font-size: 2em;
+    line-height: 1em;
+    text-align: center;
+}
+
+.image_previously_item{
+    max-width: 100%;
+}
+
+img.vertical{
+    margin-top: 8px!important;
+}
+
+
+@media screen and (max-width: 1000px) {
+    #previously{
+        padding-top: 10px;
+        padding-bottom: 10px;
+        margin-top: 30px;
+        height: auto;
+        background: rgba(0,0,0,0.85);
+        padding-top: 20px;
+        padding-bottom: 40px;
+    }
+
+    #wrapper_previously{
+        width: 94%;
+        margin: auto;
+        position: relative;
+        height: auto;
+        /*background: snow;*/
+    }
+
+    .previously_item{
+        width: 100%;
+        position: relative;
+        margin-right: 5%;
+        background: rgba(0,0,0,0.9);
+        display: inline-block;
+        cursor: pointer;
+        transition: all 0.25s;
+        margin-bottom: 5%;
+    }
+
+    .previously_item:hover{
+        opacity: 0.8;
+    }
+
+    .previously_item:nth-child(4){margin-right: 0!important;}
+
+    .texte_previously_item{
+        font-family: lacrima_serifregular;
+        color: rgba(255,255,255,0.75);
+        text-align: center;
+        margin-left: 2%;
+        margin-right: 2%;
+    }
+
+    .titre_previously_item{
+        font-family: aveny_tmedium;
+        color: rgba(255,255,255,0.9);
+        font-weight: 1.2em;
+        line-height: 1em;
+        margin: 0;
+        margin-top: 20px;
+        font-weight: 400!important;
+        text-align: center;
+    }
+
+    #previously_retrouvez{
+        margin-top: 15px!important;
+        margin-bottom: 30px;
+        font-family: lacrima_serifregular;
+        color: rgba(255,255,255,0.5);
+        font-weight: 2em;
+        line-height: 1em;
+        text-align: center;
+    }
+
+    .image_previously_item{
+        max-width: 100%;
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*VERSION MOBILE ET ORDI PORTABLE*/
+
+@media screen and (max-width: 1200px) {
+    #chapeau{
+        font-family: lacrima_serifregular;
+        font-size: 1.2em;
+        margin-top: 35px;
+        max-width: 70%;
+        text-align: center;
+        margin: auto;
+    }
+
+}
+
+@media screen and (max-width: 900px) {
+    h1{
+        font-size: 3.5em;
+    }
+}

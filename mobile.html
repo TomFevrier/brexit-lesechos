@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- On se met en UTS-8 pour les caractères spéciaux -->
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="icon" href="img/favicon.ico" />
+
+		<!-- Charger les feuilles de style -->
+		<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css">
+		<link rel="stylesheet" type="text/css" href="css/mobile.css" />
+		<link href="css/jquery-ui-1.10.3.custom.css" rel="stylesheet" />
+
+		<!-- Charger D3JS -->
+		<script src="http://d3js.org/d3.v4.min.js"></script>
+		<script src="http://d3js.org/topojson.v2.js"></script>
+		<script src="https://d3js.org/d3-queue.v3.min.js"></script>
+
+		<!-- Charger jQuery -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+		<script src="class.Gselper.js" type="text/javascript"></script>
+
+		<!-- Scrollama -->
+		<script src="https://unpkg.com/intersection-observer@0.5.1/intersection-observer.js"></script>
+		<script src="https://unpkg.com/scrollama"></script>
+		<script src='stickyfill.min.js'></script>
+
+		<title>(PROD) Brexit</title>
+
+	</head>
+	<body>
+	<!-- TAG XITI -->
+
+	<script type="text/javascript">
+	<!--
+	xtnv = document;
+	xtsd = "https://logs1122";
+	xtsite = "542199";
+	xtn2 = "31";
+	xtpage = "dechets::andramobile";
+	xtdi = "";
+	xt_multc = "";
+	xt_an = "";
+	xt_ac = "";
+	//do not modify below
+	if (window.xtparam!=null){window.xtparam+="&ac="+xt_ac+"&an="+xt_an+xt_multc;}
+	else{window.xtparam="&ac="+xt_ac+"&an="+xt_an+xt_multc;};
+	//-->
+	</script>
+	<script type="text/javascript" src="https://assets.lesechos.com/common/js/xtcore.js"></script>
+	<noscript>
+	<img width="1" height="1" alt="" src="http://logs1122.xiti.com/hit.xiti?s=542199&s2=31&p=dechets::andramobile&di=&an=&ac=" >
+	</noscript>
+
+
+	<script>
+
+	$(document).ready(function(){
+
+		// using d3 for convenience
+		var main = d3.select('body')
+		var scrolly = main.select('#scrolly');
+		var figure = scrolly.select('figure');
+		var article = scrolly.select('article');
+		var step = article.selectAll('.step');
+
+		// initialize the scrollama
+		var scroller = scrollama();
+
+		// generic window resize listener event
+		function handleResize() {
+			// 1. update height of step elements
+			// var stepH = Math.floor(window.innerHeight * 0.75);
+			// step.style('height', stepH + 'px');
+
+			var figureHeight = window.innerHeight
+			var figureMarginTop = (window.innerHeight - figureHeight) / 2
+
+			figure
+				.style('height', figureHeight + 'px')
+				.style('top', figureMarginTop + 'px');
+
+
+			// 3. tell scrollama to update new element dimensions
+			scroller.resize();
+		}
+
+		// scrollama event handlers
+		function handleStepEnter(response) {
+
+			console.log(response);
+
+			switch(response.index) {
+
+				case 0:
+					(response.direction === "down") ? animateLine() : resetAll();
+					break;
+
+				case 1:
+					(response.direction === "down") ? changeXScale() : resetXScale();
+					break;
+
+				case 2:
+					if (response.direction === "down") {
+						fadeOutLine();
+						setTimeout(function() {
+							animateLineTo(new Date(d3.select(response.element).attr('data-date')));
+						}, 500);
+					}
+					else {
+						animateLineTo(new Date(d3.select(response.element).attr('data-date')));
+					}
+					break;
+
+				default:
+					animateLineTo(new Date(d3.select(response.element).attr('data-date')));
+
+			}
+
+		}
+
+		function setupStickyfill() {
+			d3.selectAll('.sticky').each(function () {
+				Stickyfill.add(this);
+			});
+		}
+
+		function init() {
+			setupStickyfill();
+
+			// 1. force a resize on load to ensure proper dimensions are sent to scrollama
+			handleResize();
+
+			// 2. setup the scroller passing options
+			// 		this will also initialize trigger observations
+			// 3. bind scrollama event handlers (this can be chained like below)
+			scroller.setup({
+				step: '#scrolly article .step',
+				offset: 0.33,
+				debug: false,
+			})
+				.onStepEnter(handleStepEnter)
+
+
+			// setup resize event
+			window.addEventListener('resize', handleResize);
+		}
+
+		// kick things off
+		init();
+
+
+	d3.formatDefaultLocale({
+		'decimal': ',',
+		'thousands': ' ',
+		'grouping': [3],
+		'currency': ['$', ''],
+		'percent': ' %'
+	});
+
+	largeur = $( ".chart" ).width();
+	hauteur = largeur / 0.7;
+
+
+	var width = largeur,
+    	height = hauteur,
+    	margin = hauteur * 0.1;
+
+    var xAxis, yAxis;
+    var lineGenerator, line;
+    var circles, arrows;
+
+    var rates = [], events = [];
+
+    //Créer et ajouter un svg
+	var svg = d3.select(".chart").append("svg")
+	    .attr("width", width)
+	    .attr("height", height);
+
+	// Définir les triangles pour les axes
+	svg.append('svg:defs').append('svg:marker')
+	    .attr('id', 'triangle')
+	    .attr('refX', 6)
+	    .attr('refY', 6)
+	    .attr('markerWidth', 30)
+	    .attr('markerHeight', 30)
+	    .attr('markerUnits','userSpaceOnUse')
+	    .attr('orient', 'auto')
+	    .append('path')
+		    .attr('d', 'M 0 12 6 0 12 12 6 9')
+		    .attr('fill', 'grey');
+
+	// Créer les échelles
+	var xScale = d3.scaleLinear()
+		.rangeRound([margin, width - margin]);
+
+	var yScale = d3.scaleTime()
+		.rangeRound([margin, height - margin]);
+
+
+		loadRates();
+
+	    function loadRates() {
+	    	d3.csv('./source/livre.csv',
+	    		function(d) {
+		    		return {
+				        date: new Date(d.date),
+				        rate: +d.rate.replace(',', '.')
+				    };
+				},
+	    		function(error, data) {
+					rates = data;
+					loadGoogleDoc();
+				}
+			);
+	    }
+
+
+		function loadGoogleDoc(){
+			// Création de l'instance de Gselper
+			var doc = new Gselper({
+
+			    // Identifiant du document
+			    key: "1gBB1LszTLHeT_ufErJdnl-o7zWODeRKE77ml0VQCQr0",
+
+			    // Le worksheet du document (od6 = la première feuille par défaut)
+			    worksheet: "od6",
+
+			    // La fonction à appeler lorsque le document est chargé
+			    onComplete: function(data) {
+			    	//On compile la data du Google Doc dans un nouveau tableau html...
+			        // ...puis, parcourir le document ligne après ligne...
+			        $.each(doc.get(), function(i, line) {
+			        	line = {
+			        		date: new Date(line.date),
+			        		event: line.event
+			        	}
+			        	//... et ajouter chaque ligne au tableau
+			            events.push(line);
+			        });
+			        drawAxes();
+			        drawLine();
+			       	createCircles();
+			    },
+
+			    // La fonction à appeler lorsque qu'une erreur survient dans le chargement
+			    onFail: function(data) {
+			        console.log( "Something happened. Something happened." );
+			    }
+			});
+		}
+
+	function drawAxes() {
+
+		// Afficher les données dans la console pour vérifier que tout est ok
+		console.log(rates);
+		console.log(events);
+
+		// Mettre à jour les bornes des échelles en fonction des données
+		xScale.domain([0, d3.max(rates, function(d) {
+			return d.rate;
+		})]);
+		yScale.domain(d3.extent(rates, function(d) {
+			return d.date;
+		}));
+		// yScale.domain([0, d3.max(rates, function(d) {
+		// 	return d.rate;
+		// })]);
+
+		xAxis = d3.axisTop(xScale)
+			.ticks(8)
+			.tickSizeOuter(0);
+		svg.append('g')
+			.attr('class', 'xAxis')
+			.attr('transform', `translate(0, ${margin})`)
+			.call(xAxis);
+
+		yAxis = d3.axisLeft(yScale)
+			.tickFormat(d3.timeFormat('jan %Y'))
+			.ticks(d3.timeYear, 1)
+			.tickSizeOuter(0);
+		svg.append('g')
+			.attr('class', 'yAxis')
+			.attr('transform', `translate(${margin}, 0)`)
+			.call(yAxis)
+			.select('path')
+				.attr('marker-end', 'url(#triangle)');
+	}
+
+
+	function drawLine() {
+
+		lineGenerator = d3.line()
+			.x(function(d) {
+				return xScale(d.rate);
+			})
+			.y(function(d) {
+				return yScale(d.date);
+			});
+
+		line = svg.append('path')
+			.attr('d', lineGenerator(rates))
+			.attr('class', 'line')
+			.style('stroke', 'red')
+	    	.style('stroke-width', 2)
+	    	.style('stroke-linecap', 'round')
+	    	.style('fill', 'none')
+	    	.style('opacity', 0.7);
+
+	    console.log(line)
+
+	    var lineLength = line.node().getTotalLength();
+
+		line
+	    	.attr('stroke-dasharray', `${lineLength} ${lineLength}`)
+			.attr('stroke-dashoffset', lineLength);
+
+	}
+
+	function createCircles() {
+
+		// Ajouter les cercles
+		circles = svg.append('g')
+			.attr('class', 'circles')
+			.selectAll('circle')
+			.data(events).enter()
+				.append('circle')
+					.attr('r', 0)
+					.attr('fill', 'black')
+					.attr('stroke-width', 2)
+					.attr('stroke', 'snow')
+					.attr('title', function(d) {
+						return `
+							<b>${d.date.toLocaleDateString()}</b>
+							<br />
+							${d.event}
+						`;
+					});
+
+		arrows = svg.append('g')
+			.attr('class', 'arrows');
+
+		for (let i = 0; i < events.length; i++) {
+			d3.xml(`./img/arrow-01.svg`)
+				.mimeType("image/svg+xml")
+				.get(function(error, xml) {
+					let importedNode = document.importNode(xml.documentElement, true);
+					let path = d3.select(importedNode).select('path')
+						.node();
+					let arrow = arrows.append('g')
+						.attr('class', 'arrow')
+						.style('opacity', 0)
+						.node().appendChild(path);
+
+				});
+		}
+	}
+
+	function resetAll() {
+		line.remove();
+		svg.select('.circles').remove();
+		svg.select('.arrows').remove();
+
+		drawLine();
+		createCircles();
+	}
+
+
+	function changeXScale() {
+
+		xScale.domain([
+			d3.min(rates, function(d) {
+				return d.rate;
+			}) - 0.01,
+			d3.max(rates, function(d) {
+				return d.rate;
+			})
+		]);
+
+		svg.select('.xAxis')
+			.transition()
+			.duration(1000)
+			.call(xAxis);
+
+		line
+			.transition()
+			.duration(1000)
+			.attr('d', lineGenerator(rates));
+
+		circles
+			.attr('cx', function(d) {
+				return xScale(rates.filter(function(e) {
+					return e.date.getTime() == d.date.getTime();
+				})[0].rate);
+			})
+			.attr('cy', function(d) {
+				return yScale(d.date);
+			});
+
+		arrows.selectAll('.arrow').each(function(d, i) {
+
+			let cx = xScale(rates.filter(function(e) {
+					return e.date.getTime() == events[i].date.getTime();
+				})[0].rate) - this.getBBox().height - 20;
+			let cy = yScale(events[i].date) - this.getBBox().width + 8;
+
+			d3.select(this).attr('transform', `translate(${cx}, ${cy})`);
+
+			d3.select(this).append('text')
+				.attr('class', 'annotation')
+				.attr('x', 0)
+				.attr('y', 15)
+				.attr('text-anchor', 'end')
+				.text(d3.format('.2f')(rates.filter(function(e) {
+					return e.date.getTime() == events[i].date.getTime();
+				})[0].rate));
+
+		});
+	}
+
+	function resetXScale() {
+		xScale.domain([0, d3.max(rates, function(d) {
+			return d.rate;
+		})]);
+		svg.select('xAxis')
+			.transition()
+			.duration(1000)
+			.call(xAxis);
+		line
+			.transition()
+			.duration(1000)
+			.attr('d', lineGenerator(rates))
+			.attr('stroke-dashoffset', 0)
+			.attr('stroke-dasharray', 'none');
+
+		svg.selectAll('circle')
+			.transition()
+			.duration(500)
+				.style('r', 0);
+		arrows.selectAll('.arrow')
+			.transition()
+			.duration(500)
+				.style('opacity', 0);
+	}
+
+
+	function animateLine() {
+		line
+			.transition()
+			.duration(2000)
+				.attr('stroke-dashoffset', 0)
+
+		setTimeout(function() {
+			line.attr('stroke-dasharray', 'none');
+		}, 2000);
+	}
+
+
+	function animateLineTo(date) {
+
+		let lineLength = line.node().getTotalLength();
+
+		for (var n = 0; n < lineLength; n += 0.001*lineLength) {
+			let coords = line.node().getPointAtLength(n);
+			if (coords.y >= yScale(date)) break;
+		}
+
+		// n -= 0.001*lineLength;
+
+		line
+			.transition()
+			.duration(1000)
+				.attr('stroke-dashoffset', lineLength - n)
+				.style('opacity', 1);
+
+
+		setTimeout(function() {
+
+			let currentLength = line.attr('stroke-dashoffset');
+
+			svg.selectAll('circle').each(function(d, i) {
+				if ((d3.select(this).attr('r') == 0) && (d3.select(this).attr('cy') <= line.node().getPointAtLength(lineLength - currentLength).y)) {
+
+					d3.select(this)
+					.transition()
+					.duration(500)
+						.attr('r', 6);
+
+					d3.select(`.arrow:nth-child(${i+1})`)
+					.transition()
+					.duration(500)
+						.style('opacity', 1);
+
+
+				}
+				if ((d3.select(this).attr('r') == 6) && (d3.select(this).attr('cy') > line.node().getPointAtLength(lineLength - currentLength).y)) {
+
+					d3.select(this)
+					.transition()
+					.duration(500)
+						.attr('r', 0);
+
+					d3.select(`.arrow:nth-child(${i+1})`)
+					.transition()
+					.duration(500)
+						.style('opacity', 0);
+
+				}
+			});
+
+		}, 1000);
+
+	}
+
+
+	function fadeOutLine() {
+
+		line
+			.transition()
+			.duration(500)
+				.style('opacity', 0);
+
+		setTimeout(function() {
+			var lineLength = line.node().getTotalLength();
+			line
+				.attr('stroke-dasharray', `${lineLength} ${lineLength}`)
+				.attr('stroke-dashoffset', lineLength)
+		}, 500);
+
+	}
+
+	//Boutons partage social
+
+	//Twitter
+	(function() {
+
+		  var getPostTitle = "La carte de France des déchets nucléaires",
+		    linkElement = document.getElementById("tweet-this-post"),
+		    getPostLink = "http://media.lesechos.fr/infographie/andra/"
+
+		  linkElement.setAttribute("href", getPostLink);
+
+		  $(linkElement).on("click", function(event) {
+
+		    event.preventDefault();
+
+		    var tweetedLink = this.getAttribute("href");
+
+		    window.open("https://twitter.com/intent/tweet?url=" + tweetedLink + "&text=" + getPostTitle + "&via=EchosGraphiques&", "twitterwindow", "height=450, width=550, toolbar=0, location=0, menubar=0, directories=0, scrollbars=0");
+
+		  });
+
+		})();
+
+	//Facebook
+	var fbButton = document.getElementById('fb-share-button');
+	var url = "http://media.lesechos.fr/infographie/andra/"
+
+	fbButton.addEventListener('click', function() {
+	    window.open('https://www.facebook.com/sharer/sharer.php?u=' + url,
+	        'facebook-share-dialog',
+	        'width=800,height=600'
+	    );
+	    return false;
+	});
+
+
+	})//FIN DU DOCUMENT.READY
+
+
+	$(document).scroll(function() {
+
+		var myScroll = $(this).scrollTop()
+		var hauteurDoc = $(document).height()
+		var hauteurFenetre = $(window).height()
+		var pourcentPage = myScroll / (hauteurDoc - hauteurFenetre) * 100
+
+		var hauteur_scrolly = $("#scrolly").offset().top
+
+		//console.log(hauteurFenetre, myScroll)
+
+		if(myScroll > hauteur_scrolly){
+			$("titre_carte").css("display", "none")
+		}else{
+		}
+
+		if(myScroll > (hauteurFenetre / 100 * 120)){
+			$("#bandeau_echos").slideDown(200)
+		}else{
+			$("#bandeau_echos").slideUp(200)
+		}
+
+		$("#timer").css("width", pourcentPage+"%")
+
+	});
+
+
+	// Charger les tooltips
+	$(window).load(function () {
+		//Tooltips
+		$(function() {
+		  var positionCentre = { my: 'center bottom-40', at: 'center top' };
+		  $("svg").tooltip({
+		        track: true,
+		        show: {
+		          effect: "fade",
+		            duration: 0
+		        },
+		        hide: {
+		            effect: "fade",
+		            duration: 100
+		        },
+		        position: positionCentre,
+		      // Objets concernés par les tooltips
+		      items: "circle",
+		        content: function() {
+		        	//Attribut de l'objet à mettre dans les tooltips
+		      		return $( this ).attr( "title" );
+		        }
+		     });
+
+		})
+
+
+		//Centrer intro
+		$("#pave_titre").css("top", function(){
+			height_pave = $("#pave_titre").height()
+			hauteur = $( window ).height()
+			return (hauteur - height_pave) / 2+"px"
+		})
+
+
+
+	})//Fin du window.load
+
+
+
+
+	</script>
+	<!-- Intro plein écran -->
+	<div id="titraille">
+		<div id="wrapper_titraille">
+			<div id="bloc_titre">
+				<h1>Bla bla</h1>
+				<p id="chapeau">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+				tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+				quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+				consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+				cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+				proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+				<p id="noms_intro">Par Sophie Amsili & Tom Février</p>
+			</div>
+			<img src="img/logoblanc.png">
+		</div>
+	</div>
+
+	<div class="conteneur">
+		<p class="paragraphe premier_paragraphe"><i>&laquo;&nbsp;In or out?&nbsp;&raquo;</i> Rester dans l'Union européenne ou en sortir&nbsp;? Cette question ouverte soumise aux Britanniques le 23 juin 2016 était une promesse du Premier ministre David Cameron trois ans plus tôt pour contrer la montée du parti eurosceptique UKIP.</p>
+		<img src='./img/UNE Echos Brexit.jpg' />
+		<p class="paragraphe dernier_paragraphe">Depuis, Londres s’est enfoncé dans une crise politique dont les nombreux rebondissements se sont traduits par une forte volatilité de la livre sterling.</p>
+	</div>
+
+
+	<div id="bandeau_echos" style="">
+		<a href="https://www.lesechos.fr/" target="_blank"><img src="img/favicon.ico" id="logobandeau"></a>
+		<div id="timer" style="width: 100%;"></div>
+		<img src="img/logofacebook.png" id="fb-share-button" class="logo_social">
+		<a id="tweet-this-post"><img src="img/logotwitter.png" id="logotwitter" class="logo_social"></a>
+	</div>
+
+
+
+	<p id="titre_carte"></p>
+
+	<!-- CARTE -->
+	<section id='scrolly'>
+
+		<figure>
+			<div class="chart"></div>
+		</figure>
+
+		<article>
+			<div class='step'>
+				<p>Voici le cours de la livre sterling (en équivalent dollar), depuis le 1<sup>er</sup> juin 2016. Celui-ci semble relativement stable, mais en réalité une baisse de quelques points de pourcentage est dramatique.</p>
+			</div>
+			<div class='step'>
+				<p>Pour mieux visualiser ces fluctuations, nous faisons donc commencer le graphique à partir du plus bas niveau atteint par la livre sur cette période.</p>
+			</div>
+			<div class='step' data-date='6/23/16'>
+				<h3>La surprise du référendum</h3>
+				<p><i>&laquo;&nbsp;Leave or Remain?&nbsp;&raquo;</i> Les Britanniques se prononcent à 51,9&nbsp;% en faveur de la première option, celle de la sortie de leur pays de l'Union européenne (UE). Le lendemain, alors que David Cameron annonce sa démission, la livre sterling perd jusqu'à 12&nbsp;%, la plus forte variation en cours de journée de son histoire.</p>
+				<p class='link'><a href='https://www.lesechos.fr/2016/06/krach-de-la-livre-sterling-210497'>En savoir plus</a></p>
+			</div>
+			<div class='step' data-date='7/13/16'>
+				<h3>Theresa May à Downing Street</h3>
+				<p>La ministre de l'Intérieur de David Cameron est nommée Première ministre.<i>&laquo;&nbsp;Le Brexit signifie le Brexit, et nous allons en faire un succès, promet cette eurosceptique qui avait pourtant fait campagne pour le Remain.&nbsp;&raquo;</i></p>
+			</div>
+			<div class='step' data-date='10/7/16'>
+				<h3>&laquo;&nbsp;Flash crash&nbsp;&raquo; historique</h3>
+				<p>Une série de facteurs difficilement identifiables font plonger la livre de 9&nbsp;% en 40 secondes pour atteindre son plus bas niveau depuis 1985. Des propos de François Hollande sur un &laquo;&nbsp;Brexit dur&nbsp;&raquo; sont d'abord pointés du doigt. Mais la Banque d'Angleterre privilégiera ensuite la piste d'une erreur humaine, tandis que la Banque des Règlements Internationaux soulignera le rôle des opérations de couverture d’options et des &laquo;&nbsp;ordres stop&nbsp;&raquo; (qui se déclenchent automatiquement en cas de franchissement de seuil).</p>
+				<p class='link'><a href='https://www.lesechos.fr/2016/10/la-livre-sterling-chute-la-bourse-de-londres-frole-un-record-213124'>En savoir plus</a></p>
+				<p class='link'><a href='https://www.lesechos.fr/2016/12/flash-crash-de-la-livre-sterling-la-piste-de-lerreur-humaine-235946'>En savoir plus</a></p>
+				<p class='link'><a href='https://www.lesechos.fr/2017/01/la-bri-livre-sa-version-du-flash-crash-historique-de-la-livre-sterling-159958'>En savoir plus</a></p>
+			</div>
+			<div class='step' data-date='1/17/17'>
+				<h3>Le plan de Londres</h3>
+				<p>La Première ministre annonce vouloir un retrait total du marché unique et de l'union douanière, la fin du principe de libre-circulation des travailleurs européens et un Brexit <i>&laquo;&nbsp;par étapes&nbsp;&raquo;</i>. Surtout, elle annonce que l'accord final sera soumis aux deux chambres du Parlement. La livre sterling reprend des couleurs.</p>
+				<p class='link'><a href='https://www.lesechos.fr/2017/01/marche-unique-immigration-theresa-may-devoile-son-plan-pour-le-brexit-159537'>En savoir plus</a></p>
+			</div>
+			<div class='step' data-date='3/29/17'>
+				<h3>Le Royaume-Uni déclenche l'article 50</h3>
+				<p>Londres initie  sa procédure de sortie de l'UE, fixée exactement deux ans plus tard.</p>
+				<p class='link'><a href='https://www.lesechos.fr/2017/03/brexit-theresa-may-donne-le-coup-denvoi-de-deux-ans-de-negociations-163536'>En savoir plus</a></p>
+				<img src='./img/29 mars 2017- Tusk Lettre-SIPA.jpg' />
+				<p class='caption'> © Olivier Matthys/AP/SIPA</p>
+			</div>
+			<div class='step' data-date='6/8/17'>
+				<h3>May convoque des élections surprises... et les perd</h3>
+				<p>La Première ministre perd son pari&nbsp;: elle qui avait convoqué des législatives anticipées pour conforter sa majorité est désormais contrainte de s'allier avec le parti nord-irlandais DUP. La livre sterling recule de 2&nbsp;% le lendemain.</p>
+				<p class='link'><a href='https://www.lesechos.fr/2017/06/legislatives-au-royaume-uni-theresa-may-perd-sa-majorite-absolue-172863'>En savoir plus</a></p>
+			</div>
+			<div class='step' data-date='6/19/17'>
+				<h3>Les négociations commencent</h3>
+				<p>Les négociations s'ouvrent officiellement entre Michel Barnier, négociateur en chef des Européens et David Davis, représentant des Britanniques. Les Européens affichent un front uni, et ont défini trois dossiers prioritaires&nbsp;: les droits citoyens européens résidant au Royaume-Uni, la facture du divorce et la frontière irlandaise.</p>
+				<img src='./img/19 juin 2017-Nego Brexit Barnier Davis-SIPA.jpg' />
+				<p class='caption'> © Geert Vanden Wijngaert/AP/SIPA</p>
+			</div>
+			<div class='step' data-date='12/15/17'>
+				<h3>Un accord de principe est trouvé</h3>
+				<p>Les équipes Barnier et Davis trouvent un compromis sur les modalités du divorce. Elles peuvent passer à la deuxième phase des négociations&nbsp;: les futures relations commerciales entre Londres et Bruxelles.</p>
+				<p class='link'><a href='https://www.lesechos.fr/2017/12/brexit-un-accord-a-ete-trouve-entre-londres-et-bruxelles-189301'>En savoir plus</a></p>
+			</div>
+			<div class='step' data-date='1/24/18'>
+				<p>Après l'accord signé fin 2017, la publication de bons chiffres sur l'économie britannique porte la livre face au dollar. Elle repasse pour la première fois depuis le référendum au-dessus de 1,40 dollar.</p>
+			</div>
+			<div class='step' data-date='3/19/18'>
+				<h3>Premier projet d'accord</h3>
+				<p>Londres et Bruxelles s'entendent sur les conditions d'une période de transition de 21 mois à partir du 30 mars 2019. Une question reste toutefois en suspens&nbsp;: la frontière nord-irlandaise.</p>
+				<p class='link'><a href='https://www.lesechos.fr/2018/03/brexit-la-livre-sterling-grimpe-apres-laccord-de-transition-986972'>En savoir plus</a></p>
+				<img src='./img/19 mars 2018-Accord Signature-AFP.jpg' />
+				<p class='caption'> © Emmanuel Dunand/AFP</p>
+			</div>
+			<div class='step' data-date='4/1/18'>
+				<p>Des signes de ralentissement de l'économie britannique au premier semestre 2018 et le climat d'incertitude à un an du Brexit pèsent toutefois sur la livre.</p>
+			</div>
+
+			<div class='step' data-date='7/7/18'>
+				<h3>Londres propose un &laquo;&nbsp;soft Brexit&nbsp;&raquo;...</h3>
+				<p>Le gouvernement de Theresa May propose de conserver la libre circulation des produits. Ce plan &mdash; dit  &laquo;&nbsp;plan de Chequers&nbsp;&raquo; &mdash; doit limiter les dommages pour les entreprises et surtout régler la question irlandaise. Mais il entraîne le départ de ministres  &laquo;&nbsp;hard-brexiters&nbsp;&raquo; dans les jours suivants&nbsp;: le ministre du Brexit David Davis puis celui des Affaires étrangères Boris Johnson.</p>
+				<p class='link'><a href='https://www.lesechos.fr/2018/07/londres-choisit-la-voie-du-soft-brexit-975307'>En savoir plus</a></p>
+				<img src='./img/7 juillet 2018-May-Chequers-SIPA.jpg' />
+				<p class='caption'> © Joel Rouse/Shutterstock/SIPA</p>
+			</div>
+			<div class='step' data-date='9/20/18'>
+				<h3>... qui est rejeté par l'UE</h3>
+				<p>Réunis en sommet à Salzbourg, les dirigeants européens infligent un camouflet à la Première ministre britannique en rejetant son plan.</p>
+				<p class='link'><a href='https://www.lesechos.fr/monde/europe/brexit-le-camouflet-de-salzbourg-accroit-encore-la-pression-sur-theresa-may-139749'>En savoir plus</a></p>
+				<img src='./img/Sommet europeen 21 mars 2019-AFP.jpg' />
+				<p class='caption'> © Emmanuel Dunand/AFP</p>
+			</div>
+			<div class='step' data-date='11/14/18'>
+				<h3>Un accord est signé, nouvelle vague de départs</h3>
+				<p>Theresa May signe à Bruxelles un accord technique qui prévoit de laisser l'ensemble du Royaume-Uni dans l'union douanière avec l'UE. Il reste à le faire valider par le Parlement. Quatre ministres ou secrétaires d'Etat du gouvernement démissionnent le lendemain, dont Dominic Raab, le nouveau ministre en charge du Brexit.</p>
+				<p class='link'><a href='https://www.lesechos.fr/monde/europe/accord-sur-le-brexit-may-peine-a-obtenir-le-soutien-de-son-gouvernement-147576'>En savoir plus</a></p>
+			</div>
+			<div class='step' data-date='12/11/18'>
+				<h3>La bataille du Parlement commence</h3>
+				<p>Face à l'hostilité affichée par son parti, Theresa May reporte le vote à la Chambre des Communes et tente de renégocier l'accord avec Bruxelles. En vain. La livre sterling chute à son plus bas niveau depuis 20 mois, à 1,25 dollar. Sur l'ensemble de l'année, la devise aura perdu 6,7&nbsp;% face au billet vert et 1,6&nbsp;% contre l'euro.</p>
+				<p class='link'><a href='https://www.lesechos.fr/finance-marches/marches-financiers/la-livre-sterling-au-plus-bas-depuis-18-mois-238153'>En savoir plus</a></p>
+				<img src='./img/11 decembre 2018-bataille Parlement-AFP.jpg' />
+				<p class='caption'> © Mark Duffy/AFP</p>
+			</div>
+			<div class='step' data-date='1/15/19'>
+				<h3>Premier rejet de l'accord au Parlement</h3>
+				<p>Peu de réaction sur les marchés qui avaient anticipé ce rejet.</p>
+				<p class='link'><a href='https://www.lesechos.fr/finance-marches/marches-financiers/brexit-les-marches-parient-sur-un-plan-b-471486'>En savoir plus</a></p>
+			</div>
+			<div class='step' data-date='2/27/19'>
+				<p>Le scénario d'un report du Brexit est de plus en plus évoqué, tirant la livre vers le haut.</p>
+				<p class='link'><a href='https://www.lesechos.fr/finance-marches/marches-financiers/brexit-la-livre-sterling-remonte-994187'>En savoir plus</a></p>
+			</div>
+			<div class='step' data-date='3/12/19'>
+				<h3>Deuxième rejet de l'accord au Parlement</h3>
+				<p>Dans la foulée, la Chambre des Communes refuse un &laquo;&nbsp;no deal&nbsp;&raquo; puis autorise la Première ministre à demander un report du Brexit.</p>
+				<p class='link'><a href='https://www.lesechos.fr/monde/europe/brexit-la-strategie-de-theresa-may-en-echec-999904'>En savoir plus</a></p>
+			</div>
+			<div class='step' data-date='3/21/19'>
+				<h3>Bruxelles accepte un report</h3>
+				<p>La date du divorce est reportée au 12 avril, voire au 22 mai si le Parlement décide de voter l'accord de sortie.</p>
+				<p class='link'><a href='https://www.lesechos.fr/monde/europe/brexit-les-europeens-resserrent-letau-sur-theresa-may-1002602'>En savoir plus</a></p>
+			</div>
+			<div class='step' data-date='3/28/19'>
+				<h3>Le Parlement tente de reprendre la main</h3>
+				<p>Les députés votent un amendement leur permettant de proposer des solutions alternatives à l'accord... mais les huit choix mis au vote sont tous rejetés. Ils votent ensuite pour la troisième fois contre l'accord de Theresa May. La confusion est totale.</p>
+				<p class='link'><a href='https://www.lesechos.fr/2018/07/londres-choisit-la-voie-du-soft-brexit-975307'>En savoir plus</a></p>
+			</div>
+			<div class='step' data-date='4/3/19'>
+				<h3>Theresa May se tourne vers Jeremy Corbyn</h3>
+				<p>Aucune solution n'émerge cependant des discussions entre la Première ministre et le leader du parti travailliste.</p>
+				<p class='link'><a href='https://www.lesechos.fr/monde/europe/brexit-theresa-may-tend-la-main-a-jeremy-corbyn-1006056'>En savoir plus</a></p>
+			</div>
+			<div class='step' data-date='4/10/19'>
+				<h3>Le Brexit reporté au 31 octobre</h3>
+				<p>Les Vingt-Sept s'entendent finalement sur un nouveau délai de six mois. <i>&laquo;&nbsp;Si nous arrivons à ratifier l'accord dans les trois premières semaines du mois de mai, nous ne participerons pas aux élections européennes et nous quitterons l'Union le 1er juin&nbsp;&raquo;</i>, espère Theresa May.</p>
+				<p class='link'><a href='https://www.lesechos.fr/monde/europe/macron-oblige-les-europeens-a-limiter-la-prolongation-du-brexit-1008411'>En savoir plus</a></p>
+			</div>
+			<div class='step' data-date='5/21/19'>
+				<h3>La dernière proposition de May</h3>
+				<p>La Première ministre propose un nouvel accord aux députés, incluant la possibilité d'un second référendum. Il est sèchement rejeté par tous les bords. La ministre chargée des relations avec le Parlement Andrea Leadsom démissionne.</p>
+				<p class='link'><a href='https://www.lesechos.fr/monde/europe/brexit-theresa-may-poussee-vers-la-sortie-1023228'>En savoir plus</a></p>
+			</div>
+			<div class='step' data-date='5/24/19'>
+				<h3>Theresa May jette l'éponge</h3>
+				<p>Les larmes aux yeux, la Première ministre annonce son départ, exprimant <i>&laquo;&nbsp;son profond regret de ne pas avoir été capable de mettre en œuvre le Brexit&nbsp;&raquo;</i>. La livre s'approche de nouveau de son plus bas niveau depuis deux ans à 1,25 dollar.</p>
+				<img src='./img/24 mai 2019-May part-2-SIPA.jpg' />
+				<p class='caption'> © James Veysey/REX/SIPA</p>
+			</div>
+
+		</article>
+
+
+	</section>
+
+
+	<div id="previously">
+		<div id="wrapper_previously">
+		<h4 id="previously_retrouvez">Retrouvez nos autres grand-formats</h3>
+			<div class="previously_item" id="previously_got">
+				<h3 class="titre_previously_item">L'Ethiopie prend<br>son envol</h3>
+				<p class="texte_previously_item">En 2017 l’Ethiopie est le pays qui a connu la plus forte croissance mondiale, après la Libye.</p>
+				<a href="http://media.lesechos.fr/infographie/ethiopie/" target="_blank"><img class="image_previously_item" src="img/previously/ethiopie.jpg"></a>
+			</div><!--
+			 --><div class="previously_item" id="previously_batiments">
+				<h3 class="titre_previously_item">La Norvège :<br>poker pollueur</h3>
+				<p class="texte_previously_item">Bon élève de l'environnement ? C'est pourtant le premier producteur de pétrole en Europe</p>
+				<a href="https://media.lesechos.fr/infographie/norvege/" target="_blank"><img class="image_previously_item" src="img/previously/norvege.jpg"></a>
+			</div><!--
+			 --><div class="previously_item" id="previously_champs">
+				<h3 class="titre_previously_item">Les trois vies<br>de Bouteflika</h3>
+				<p class="texte_previously_item">De son ascension politique à sa démission, Bouteflika en 3&nbsp;frises chronologiques</p>
+				<a href="http://media.lesechos.fr/infographie/algerie/" target="_blank"><img class="image_previously_item" src="img/previously/algerie.jpg"></a>
+			</div>
+		</div>
+	</div>
+
+
+	</body>
+</html>
