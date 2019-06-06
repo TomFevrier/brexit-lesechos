@@ -299,7 +299,11 @@ h1{
 
 
 .annotation {
-    font: bold 18px Source Sans Pro;
+    font: bolder 18px Source Sans Pro;
+}
+
+.legend {
+    font: bold 22px Source Sans Pro;
 }
 
 
@@ -366,7 +370,19 @@ figure {
     color: white;
     padding: 0.5em;
     font-weight: 600;
-    font-size: 1.5rem;
+    font-size: 1.7rem;
+}
+
+.step h4 {
+    text-align: center;
+    font-family: aveny_tmedium;
+    display: block;
+    color: rgba(213,67,47,1);
+    padding: 0;
+    margin: 0;
+    margin-top: 0.5em;
+    font-weight: 600;
+    font-size: 1.4rem;
 }
 
 
